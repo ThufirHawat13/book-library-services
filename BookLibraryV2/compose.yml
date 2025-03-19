@@ -1,0 +1,39 @@
+# Версия Docker Compose
+version: '3.7'
+
+# Определение сервисов
+services:
+
+  # Сервис приложения
+  app:
+    # Сборка образа из Dockerfile, находящегося в текущей директории
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Проброс порта 8080 контейнера на порт 8080 хост-машины
+    ports:
+      - '8080:8080'
+    # Указание того, что сервис app будет запущен после сервиса db
+    # и только при условии прохождения healthcheck
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Сервис БД
+  db:
+    # Использование последненго образа PostgreSQL
+    image: postgres:latest
+    # Задание переменных окружения для создания БД
+    environment:
+      POSTGRES_DB: book_library_db
+      POSTGRES_USER: library_user
+      POSTGRES_PASSWORD: library_user
+    # Проброс порта 5432 контейнера на порт 5432 хост-машины
+    ports:
+      - '5432:5432'
+    # Проверка состояния Postgres
+    healthcheck:
+      test: ["CMD-SHELL", "ps_isready -U library_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
