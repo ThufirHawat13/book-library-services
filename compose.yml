@@ -26,7 +26,21 @@ services:
       KAFKA_LISTENERS: INTERNAL://:9090,EXTERNAL://:19090
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9090,EXTERNAL://localhost:19090
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_JMX_HOSTNAME: kafka
+      KAFKA_JMX_PORT: 9997
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - book-library-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8083:8080"
+    depends_on:
+      - kafka
+    environment:
+      DYNAMIC_CONFIG_ENABLED: true
     networks:
       - book-library-network
 
